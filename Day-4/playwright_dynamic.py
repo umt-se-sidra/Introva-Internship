@@ -1,0 +1,25 @@
+import asyncio
+from playwright.async_api import async_playwright
+
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        page = await browser.new_page()
+
+        await page.goto(
+            "https://the-internet.herokuapp.com/dynamic_loading/1"
+        )
+
+        # Click Start
+        await page.locator("#start button").click()
+
+        # Playwright automatically waits for the element
+        result = await page.locator("#finish h4").inner_text()
+
+        print("Dynamic content:", result)
+
+        await browser.close()
+
+
+asyncio.run(main())
