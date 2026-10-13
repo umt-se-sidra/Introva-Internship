@@ -1,0 +1,30 @@
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import GradientBoostingClassifier
+import xgboost as xgb
+import time
+
+X, y = make_classification(n_samples=1000, n_features=200, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Gradient Boosting
+gb_model = GradientBoostingClassifier(random_state=42)
+start_gb = time.time()
+gb_model.fit(X_train, y_train)
+end_gb = time.time()
+gb_time = end_gb - start_gb
+gb_predictions = gb_model.predict(X_test)
+gb_accuracy = accuracy_score(y_test, gb_predictions)
+
+# XGBoost
+xgb_model = xgb.XGBClassifier(random_state=42, use_label_encoder=False, eval_metric='logloss')
+start_xgb = time.time()
+xgb_model.fit(X_train, y_train)
+end_xgb = time.time()
+xgb_time = end_xgb - start_xgb
+xgb_predictions = xgb_model.predict(X_test)
+xgb_accuracy = accuracy_score(y_test, xgb_predictions)
+
+print(f"GB Time: {gb_time:.4f}s, GB Accuracy: {gb_accuracy:.4f}")
+print(f"XGB Time: {xgb_time:.4f}s, XGB Accuracy: {xgb_accuracy:.4f}")
