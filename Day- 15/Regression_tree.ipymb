@@ -1,0 +1,42 @@
+import pandas as pd
+from pandas_datareader import data
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
+data_url = "http://lib.stat.cmu.edu/datasets/boston"
+raw_df = pd.read_csv(data_url, sep=r"\s+", skiprows=22, header=None)
+
+# The Boston dataset has alternating rows for features and target values
+# We reconstruct the features matrix (X) and target array (y)
+X = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+y = raw_df.values[1::2, 2]
+
+# Define the column names for the dataset
+columns = ["CRIM", "ZN", "INDUS", "CHAS", "NOX", "RM", "AGE", "DIS", "RAD", "TAX", "PTRATIO", "B", "LSTAT"]
+boston_df = pd.DataFrame(X, columns=columns)
+boston_df["MEDV"] = y
+
+boston_df.head()
+X = boston_df.iloc[:, 0:13]
+y = boston_df.iloc[:, 13]
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=0)
+rt = DecisionTreeRegressor(criterion='squared_error', max_depth=5)
+rt.fit(X_train, y_train)
+DecisionTreeRegressor(
+    ccp_alpha=0.0,
+    criterion='squared_error',
+    max_depth=5,
+    max_features=None,
+    max_leaf_nodes=None,
+    min_impurity_decrease=0.0,
+    min_samples_leaf=1,
+    min_samples_split=2,
+    min_weight_fraction_leaf=0.0,
+    random_state=None,
+    splitter='best'
+)
+y_pred = rt.predict(X_test)
+print("R2 Score:", r2_score(y_test, y_pred))
